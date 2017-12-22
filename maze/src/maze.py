@@ -25,11 +25,11 @@ class MazeSolver:
         self.laser = None
         self.odom = None
 
-        # actuall drive state
+        # actual drive state
         self.driveState = "WallFollow"
 
         # set up wall follower
-        self.distanceToWall = 0.5
+        self.distanceToWall = 0.4
         self.angle = 1.57
         self.mutex = Lock()
 
@@ -75,7 +75,7 @@ class MazeSolver:
         rospy.spin()
 
     def wallFollower(self, actLasers, pidValue):
-        if(actLasers <= 0.5): # obstacle in front of the robot
+        if(actLasers <= self.distanceToWall + 0.05): # obstacle in front of the robot
             self.driveState = "NeedToTurn"
         elif(pidValue == 0):
             self.vel.linear.x = 0.3
@@ -102,7 +102,7 @@ class MazeSolver:
                 t1 = rospy.Time.now().to_sec()
                 current_angle = abs(angular_speed)*(t1-t0)
 
-            #Forcing the robot to stop
+            # Forcing the robot to stop
             self.vel.angular.z = 0
             self.velPub.publish(self.vel)
             self.driveState = "WallFollow"
