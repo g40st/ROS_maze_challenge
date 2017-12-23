@@ -1,7 +1,7 @@
 import rospy
 
 class PID:
-    
+
     def __init__(self, kp, ki, kd, outMin, outMax, iMin, iMax):
         self.kp = kp
         self.ki = ki
@@ -31,4 +31,4 @@ class PID:
             output = self.outMax
         if(output < self.outMin):
             output = self.outMin
-        return output*(-1)
+        return output
