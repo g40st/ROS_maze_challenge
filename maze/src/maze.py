@@ -3,6 +3,7 @@
 import rospy
 
 from threading import Thread, Lock
+import math
 
 from nav_msgs.msg import Odometry
 from geometry_msgs.msg import Twist
@@ -25,8 +26,13 @@ class MazeSolver:
         self.laser = None
         self.odom = None
 
+        # set up wall WallDetection
+        self.mutex2 = Lock()
+        self.minLaserValues = 60
+        self.intervallEpsilon = 1.5
+
         # actual drive state
-        self.driveState = "WallFollow"
+        self.driveState = "WallDetection"
 
         # set up wall follower
         self.distanceToWall = 0.4
@@ -55,28 +61,72 @@ class MazeSolver:
         while not rospy.is_shutdown():
 
             if(self.laser and self.odom): # laser and odom data arrived from callback
-                # take a bunch of lasers in front of the robot (obstacles detection)
-                lasers = 0
-                for i in range(160, 200):
-                    if(str(self.laser.ranges[i]) != 'nan'):
-                        lasers += self.laser.ranges[i]
-                actLasers = lasers / 40
 
-                if(self.driveState == "WallFollow"):
-                    pidValue = self.pid.pidExecute(self.distanceToWall, self.laser.ranges[359])
-                    #rospy.loginfo(pidValue)
-                    self.wallFollower(actLasers, pidValue)
-                elif(self.driveState == "NeedToTurn"): # rote by an angle
-                    self.rotate_angle(self.angle)
+                # take the min laser value in front of the robot (obstacles detection)
+                lasers = 0
+                actMinLaserValue = min(self.laser.ranges[170:190])
+
+                if(self.driveState == "WallDetection"):
+                    self.wallDetection(actMinLaserValue)
+                elif(self.driveState == "driveToWall"):
+                    if(self.mutex.locked() == False):
+                        if(actMinLaserValue <= self.distanceToWall + 0.05): # obstacle in front of the robot
+                            self.vel.linear.x = 0.0
+                            self.vel.angular.z = 0.0
+                            self.rotate_angle(self.angle, -0.3)
+                            self.driveState = "WallFollow"
+                        else:
+                            self.vel.linear.x = 0.3
+                            self.vel.angular.z = 0.0
+
+                elif(self.driveState == "WallFollow"):
+                    if(self.mutex.locked() == False):
+                        pidValue = self.pid.pidExecute(self.distanceToWall, self.laser.ranges[359])
+                        self.wallFollower(actMinLaserValue, pidValue)
 
                 self.velPub.publish(self.vel)
 
             self.rate.sleep()
         rospy.spin()
 
-    def wallFollower(self, actLasers, pidValue):
-        if(actLasers <= self.distanceToWall + 0.05): # obstacle in front of the robot
-            self.driveState = "NeedToTurn"
+    def wallDetection(self, actMinLaserValue):
+        self.mutex2.acquire()
+        try:
+            if(actMinLaserValue <= self.distanceToWall + 0.05):
+                self.rotate_angle(self.angle, -0.3)
+            else:
+                # search for a wall
+                arrValues = []
+                i = 0
+                while(i < len(self.laser.ranges)):
+                    valCounter = 0
+                    for k in range(i+1, len(self.laser.ranges)):
+                        # check if actual value is in interval
+                        if(self.laser.ranges[i] - self.intervallEpsilon) <= self.laser.ranges[k] <= (self.laser.ranges[i] + self.intervallEpsilon):
+                            valCounter += 1
+                        else:
+                            if(valCounter > self.minLaserValues):
+                                arrValues.append([self.laser.ranges[i], i, k])
+                            valCounter = 0
+                            i = k
+                        if(k == len(self.laser.ranges) - 1):
+                            i = len(self.laser.ranges)
+
+                # turn the robot to the wall (max distance)
+                getLaserIndex = int(math.floor((max(arrValues)[1] + max(arrValues)[2]) / 2))
+                if(getLaserIndex <= 170 or getLaserIndex >= 180):
+                    tmpAngle = self.laser.angle_min + (getLaserIndex * self.laser.angle_increment)
+                    if(getLaserIndex < 170): # rotation to the right
+                        self.rotate_angle(abs(tmpAngle), -0.25)
+                    else:   # rotation to the left
+                        self.rotate_angle(abs(tmpAngle), 0.25)
+                self.driveState = "driveToWall"
+        finally:
+            self.mutex2.release()
+
+    def wallFollower(self, actMinLaserValue, pidValue):
+        if(actMinLaserValue <= self.distanceToWall + 0.05): # obstacle in front of the robot
+            self.rotate_angle(self.angle, -0.3)
         elif(pidValue == 0):
             self.vel.linear.x = 0.3
             self.vel.angular.z = 0.0
@@ -85,10 +135,10 @@ class MazeSolver:
             self.vel.angular.z = pidValue
 
     # obstacle in front of the robot, the robot needs to rotate
-    def rotate_angle(self, angle):
+    def rotate_angle(self, angle, speed):
         self.mutex.acquire()
         try:
-            angular_speed = -0.3
+            angular_speed = speed
             relative_angle = angle
             self.vel.linear.x = 0.0
             self.vel.angular.z = angular_speed
@@ -105,7 +155,6 @@ class MazeSolver:
             # Forcing the robot to stop
             self.vel.angular.z = 0
             self.velPub.publish(self.vel)
-            self.driveState = "WallFollow"
         finally:
             self.mutex.release()
 
