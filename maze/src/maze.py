@@ -29,23 +29,20 @@ class MazeSolver:
         # set up wall detection
         self.mutex2 = Lock()
         self.minLaserValues = 60
-        self.intervallEpsilon = 1.5
+        self.intervalEpsilon = 1.5          # upper- and lower bound
 
-        # set up look detection
+        # set up loop detection
         self.knownPoints = []
-        self.epsilionAroundPoints = 0.25
-        self.timeoutForDetection = 12 # seconds
-
-        # actual drive state
-        self.driveState = "WallFollow"
+        self.epsilonAroundPoints = 0.25     # circle around the saved point
+        self.timeoutForDetection = 12       # seconds
 
         # set up wall follower
-        self.leftHand = True        # True if the robot uses the left sensor for wall follow
+        self.leftHand = True            # Tru, if the robot uses the left sensor for wall follow
         self.laserIndex = 359
         self.turnSpeed = -0.3
         self.distanceToWall = 0.4
-        self.angle = 1.57
-        self.minLasersSide = [150,170]
+        self.angle = 1.57               # around 90 degree
+        self.minLasersSide = [150,170]  # obstacles detection
         self.mutex = Lock()
 
         # set up PID
@@ -58,6 +55,9 @@ class MazeSolver:
         iMax = 0.4
         self.pid = PID(kp, ki, kd, outMin, outMax, iMin, iMax)
 
+        # actual drive state (inital: WallDetection)
+        self.driveState = "WallDetection"
+
     def odom_callback(self, odom_msg):
         self.odom = odom_msg
 
@@ -66,6 +66,8 @@ class MazeSolver:
 
     def startSolver(self):
         rospy.loginfo("start Maze Solver Node")
+
+        # if the robot uses the right sensor for wall follow
         if(not self.leftHand):
             self.laserIndex = 0
             self.minLasersSide = [190, 210]
@@ -73,11 +75,12 @@ class MazeSolver:
 
         while not rospy.is_shutdown():
             if(self.laser and self.odom): # laser and odom data arrived from callback
+
                 # append the origin to the known points
                 if(len(self.knownPoints) == 0):
                     self.knownPoints.append([self.odom.pose.pose.position.x, self.odom.pose.pose.position.y, rospy.Time.now().to_sec()])
 
-                # take the min laser value in front of the robot (obstacles detection)
+                # take the min laser value in front of the robot (simple obstacles detection)
                 actMinLaserValue = min(min(self.laser.ranges[170:190], self.laser.ranges[self.minLasersSide[0] : self.minLasersSide[1]]))
 
                 if(self.driveState == "WallDetection"):
@@ -87,6 +90,7 @@ class MazeSolver:
                 elif(self.driveState == "driveToWall"):
                     if(self.mutex.locked() == False):
                         if(actMinLaserValue <= self.distanceToWall): # obstacle in front of the robot
+
                             # save the actual position for loop detection
                             self.knownPoints.append([self.odom.pose.pose.position.x,self.odom.pose.pose.position.y, rospy.Time.now().to_sec()])
 
@@ -101,8 +105,8 @@ class MazeSolver:
                     if(self.mutex.locked() == False):
                         # check known points (loop detection)
                         for i in range(0, len(self.knownPoints)):
-                            if(self.odom.pose.pose.position.x - self.epsilionAroundPoints <= self.knownPoints[i][0] <= self.odom.pose.pose.position.x + self.epsilionAroundPoints and
-                            self.odom.pose.pose.position.y - self.epsilionAroundPoints <= self.knownPoints[i][1] <= self.odom.pose.pose.position.y + self.epsilionAroundPoints and
+                            if(self.odom.pose.pose.position.x - self.epsilonAroundPoints <= self.knownPoints[i][0] <= self.odom.pose.pose.position.x + self.epsilonAroundPoints and
+                            self.odom.pose.pose.position.y - self.epsilonAroundPoints <= self.knownPoints[i][1] <= self.odom.pose.pose.position.y + self.epsilonAroundPoints and
                             self.knownPoints[i][2] + self.timeoutForDetection <  rospy.Time.now().to_sec()):
                                 rospy.loginfo("Loop detected")
                                 self.driveState = "WallDetection"
@@ -123,11 +127,12 @@ class MazeSolver:
                 # search for a wall to follow
                 arrValues = []
                 i = 0
+                # do wall detection
                 while(i < len(self.laser.ranges)):
                     valCounter = 0
                     for k in range(i+1, len(self.laser.ranges)):
                         # check if actual value is in interval
-                        if(self.laser.ranges[i] - self.intervallEpsilon) <= self.laser.ranges[k] <= (self.laser.ranges[i] + self.intervallEpsilon):
+                        if(self.laser.ranges[i] - self.intervalEpsilon) <= self.laser.ranges[k] <= (self.laser.ranges[i] + self.intervalEpsilon):
                             valCounter += 1
                         else:
                             if(valCounter > self.minLaserValues):
@@ -139,7 +144,6 @@ class MazeSolver:
 
                 # turn the robot to the wall (max distance)
                 getLaserIndex = 180;
-                rospy.loginfo(arrValues)
                 if(arrValues):
                     getLaserIndex = int(math.floor((max(arrValues)[1] + max(arrValues)[2]) / 2))
                 if(getLaserIndex <= 170 or getLaserIndex >= 180):
@@ -188,7 +192,7 @@ class MazeSolver:
             # Forcing the robot to stop
             self.vel.angular.z = 0
             self.velPub.publish(self.vel)
-            # fixes issue #6
+            # fixes issue #6 (Weird Driving at Wall Following)
             self.pid.resetValues()
         finally:
             self.mutex.release()
