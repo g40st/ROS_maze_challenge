@@ -21,7 +21,7 @@ class PID:
         self.lastTime = 0
 
     def pidExecute(self, should, actValue):
-        now = rospy.Time.now().to_sec()
+        now = rospy.Time.now().to_nsec()
         timeChange = now - self.lastTime
         error = should - actValue
         newErrorSum = self.sumError + (error * timeChange)
