@@ -124,7 +124,7 @@ while not rospy.is_shutdown():
 
 ### Wall Follow
 
-To adopt the direction of movement a PID-controller is used.
+A PID-controller is used to adopt the direction of movement .
 
 ![wallF](/uploads/569fb71f0dcb1b3193d32ea072b9df15/wallF.gif)
 
