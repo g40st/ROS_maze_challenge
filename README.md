@@ -1,18 +1,30 @@
 # maze solver (ROS)
+This repository contains an algorithm to solve a maze. Bascially it uses wall detection and wall follow. 
 
-
-
+![maze](/uploads/0c6118ab0a00198acdcb42b54ebe1c1f/maze.png)
 
 ## Installing / Getting started (Linux)
 
-The turtlebot that you worked with until now did not really have a laser scanner. It had a camera sensor and the sensor data from the camera was being converted to laser data, which is one of the
-reasons why there were issues with the `/scan` topic whenever gazebo was reset.
+### Install Ros and other Tools
 
-Therefore, we have modified the `turtlebot_description` package that has the simulated model of the turtlebot and put in some upgrades that should make your life easier. After following these
+**Warning! Please use Ubuntu 16.04 as this is the Long Term Support Version (LTS). If you are using Ubuntu 17.04 you have to use ROS Lunar release on your own risk!**
+
+First goto http://wiki.ros.org/kinetic/Installation/Ubuntu and follow the instructions there. The installation can take some time depending on your internet connection.
+
+After the ros setup is completed you should install these extra tools
+
+```
+sudo apt-add-repository ppa:webupd8team/atom
+sudo apt-get update
+sudo apt-get install git gitg htop terminator atom
+sudo apt-get install ros-kinetic-turtlebot-simulator ros-kinetic-turtlebot-teleop
+```
+
+### Mounting Hokuyo Laser Scanner onto the Turtlebot
+
+We have modified the `turtlebot_description` package that has the simulated model of the turtlebot and put in some upgrades that should make your life easier. After following these
 instructions, you should be able to visualise the laser ray projections in gazebo, and you will have a new stable topic that gets the laser data from the new scanner, which is `/laserscan`. We
 have also enhanced the field of vision of the scan to 180 degrees and the maximum range to 30 m.
-
-Consider this our Christmas present to you! ;)
 
 * Delete the existing `turtlebot_description` package using the following commands:
 ```
@@ -20,7 +32,7 @@ cd /opt/ros/kinetic/share
 sudo rm -r turtlebot_description
 ```
 
-* Download the modified `turtlebot_description` package from this [link] (https://fbe-gitlab.hs-weingarten.de/mat-iki/amr-mat/blob/master/turtlebot_hokuyo/turtlebot_description.tar.gz) to your `Downloads`
+* Take the modified `turtlebot_description` package from `mod_turtlebot_description` to your `Downloads`
 folder. Extract the package from the compressed file.
 
 * Move the extracted package from the `Downloads` folder to the location of the deleted package using the following commands:
@@ -38,10 +50,81 @@ source ~/.bashrc
 Note that by doing this, the turtlebot will be launched with hokuyo laser scanner everytime you launch `turtlebot_gazebo`. If you want to go back to how everything was before you did all this, just delete
 the `export TURTLEBOT_3D_SENSOR` line in the `.bashrc` file.
 
-* Launch the `turtlebot_gazebo` package and hopefully, you should see your new turtlebot with enhanced superpowers like below and you should be able to see the scan data in the `/laserscan` topic.
-
+* Launch the `turtlebot_gazebo` package and hopefully, you should see your new turtlebot with enhanced superpowers like below and you should be able to see the scan data in the `/laserscan` topic. 
+  
+    To launch the simulation use: `roslaunch turtlebot_gazebo turtlebot_world.launch`
 
 ![](https://fbe-gitlab.hs-weingarten.de/mat-iki/amr-mat/raw/master/.img/turtlebot_hokuyo.png)
+
+### Loading the Maze into the Simulation
+
+All you have to do to load it is run the following command after launching the `turtlebot_gazebo package`:
+
+`rosrun gazebo_ros spawn_model -file ~/catkin_ws/src/<repo name>/maze_practice/model.sdf -sdf -model -maze -x 16 -y 5`
+
+Be sure to enter your repository name correctly in the above command. An example:
+
+`rosrun gazebo_ros spawn_model -file ~/catkin_ws/src/ch-171744_tier4/maze_practice/model.sdf -sdf -model -maze -x 16 -y 5`
+
+Your gazebo simulation should now look like below:
+
+![maze](/uploads/0c6118ab0a00198acdcb42b54ebe1c1f/maze.png)
+
+
+
+## Description of the solution
+
+### Algorithm
+
+```
+save the actual x- and y-position (loop-detection)
+call wallDetection()
+
+function wallDetection():
+    search for a wall to follow
+    adjust the angle to next wall
+    drive to the wall
+    while(not wall_arrived):
+        drive
+   save the actual x- and y-position (loop-detection)
+   make a turn and follow the wall
+   call wallFollow()
+
+function wallFollow():
+    if(loop-detected):
+        call wallDetection()
+    else:
+        if(obstacles_detected)
+           do turn ~90 degree
+        else  
+            follow wall using PID-controller
+```
+
+### Wall Detection
+
+* In this case the algorithm detects two walls. Beyond this two walls the wall with the biggest distance will be choosen. 
+
+    ![wall1](/uploads/cc804a6a30a68fbe4ef532f0910bd25d/wall1.png)
+
+* Do a turn and drive to the detected wall.
+
+    ![wallD2](/uploads/f7a27bbbd6447538e1d0f6a603f1ff5a/wallD2.png)
+
+* Save the actual x- and y-position (green circle) and do a turn. After that use the wall follow function.
+
+    ![wallD3](/uploads/be8dab7568350e134cf5cd9d9282cfa0/wallD3.png)
+
+### Wall Follow
+
+![wallF](/uploads/569fb71f0dcb1b3193d32ea072b9df15/wallF.gif)
+
+
+### Loop Detection
+
+The robot saves the start position. After that the robot will follow this wall until it hits the start position. This whole drive along the wall is skipped in the video.
+The robot hits the start position and does a wall detection. This is the reason why the robot can escape from this loop. Otherwise the robot would drive along this wall in a loop.
+
+![loopDetec](/uploads/d869d099a6487baf842f13d862310e76/loopDetec.gif)
 
 
 ## Author
