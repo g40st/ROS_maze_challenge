@@ -72,32 +72,33 @@ Your gazebo simulation should now look like below:
 
 
 
-## Description of the solution
+## Description of the Solution
 
-### Algorithm
+### Algorithm (shorted pseudocode)
 
 ```
 save the actual x- and y-position (loop-detection)
-call wallDetection()
+state = "WallDetection"
 
-function wallDetection():
-    search for a wall to follow
-    adjust the angle to next wall
-    drive to the wall
-    while(not wall_arrived):
-        drive
-   save the actual x- and y-position (loop-detection)
-   make a turn and follow the wall
-   call wallFollow()
+while not rospy.is_shutdown():
+   if(state == "WallDetection")
+        search for a wall to follow
+        adjust the angle to next wall
+        drive to the wall
+        while(not wall_arrived):
+            drive
+        save the actual x- and y-position (loop-detection)
+        make a turn 
+        state = "wallFollow"
 
-function wallFollow():
-    if(loop-detected):
-        call wallDetection()
-    else:
-        if(obstacles_detected)
-           do turn ~90 degree
-        else  
-            follow wall using PID-controller
+    elif(state == "wallFollow")
+        if(loop_detected):
+            state = "wallDetection"
+        else:
+            if(obstacles_detected)
+                do turn ~90 degree
+            else  
+                follow wall using PID-controller
 ```
 
 ### Wall Detection
@@ -105,6 +106,13 @@ function wallFollow():
 * In this case the algorithm detects two walls. Beyond this two walls the wall with the biggest distance will be choosen. 
 
     ![wall1](/uploads/cc804a6a30a68fbe4ef532f0910bd25d/wall1.png)
+    
+    How does the wall detection work:
+    
+    There must be a predefined amount of points between the upper- and lower bound. Another constraint is that the points must be next to each other. 
+    Otherwise it will not be detected as a wall.  
+    
+    ![wallDet6](/uploads/69e3766f6929081cb594986d43d67130/wallDet6.png)
 
 * Do a turn and drive to the detected wall.
 
