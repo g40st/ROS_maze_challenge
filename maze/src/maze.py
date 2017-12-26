@@ -73,8 +73,6 @@ class MazeSolver:
 
         while not rospy.is_shutdown():
             if(self.laser and self.odom): # laser and odom data arrived from callback
-                #rospy.loginfo(str(self.odom.pose.pose.position.x) + " || " + str(self.odom.pose.pose.position.y))
-
                 # append the origin to the known points
                 if(len(self.knownPoints) == 0):
                     self.knownPoints.append([self.odom.pose.pose.position.x, self.odom.pose.pose.position.y, rospy.Time.now().to_sec()])
@@ -141,6 +139,7 @@ class MazeSolver:
 
                 # turn the robot to the wall (max distance)
                 getLaserIndex = 180;
+                rospy.loginfo(arrValues)
                 if(arrValues):
                     getLaserIndex = int(math.floor((max(arrValues)[1] + max(arrValues)[2]) / 2))
                 if(getLaserIndex <= 170 or getLaserIndex >= 180):
