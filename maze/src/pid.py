@@ -15,6 +15,11 @@ class PID:
         self.sumError = 0
         self.lastTime = 0
 
+    def resetValues(self):
+        self.lastError = 0
+        self.sumError = 0
+        self.lastTime = 0
+
     def pidExecute(self, should, actValue):
         now = rospy.Time.now().to_sec()
         timeChange = now - self.lastTime

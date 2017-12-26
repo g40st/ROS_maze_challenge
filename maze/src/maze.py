@@ -37,7 +37,7 @@ class MazeSolver:
         self.timeoutForDetection = 12 # seconds
 
         # actual drive state
-        self.driveState = "WallDetection"
+        self.driveState = "WallFollow"
 
         # set up wall follower
         self.leftHand = True        # True if the robot uses the left sensor for wall follow
@@ -87,7 +87,7 @@ class MazeSolver:
                     self.wallDetection(actMinLaserValue)
                 elif(self.driveState == "driveToWall"):
                     if(self.mutex.locked() == False):
-                        if(actMinLaserValue <= self.distanceToWall + 0.05): # obstacle in front of the robot
+                        if(actMinLaserValue <= self.distanceToWall): # obstacle in front of the robot
                             # save the actual position for loop detection
                             self.knownPoints.append([self.odom.pose.pose.position.x,self.odom.pose.pose.position.y, rospy.Time.now().to_sec()])
 
@@ -118,7 +118,7 @@ class MazeSolver:
     def wallDetection(self, actMinLaserValue):
         self.mutex2.acquire()
         try:
-            if(actMinLaserValue <= self.distanceToWall + 0.05):
+            if(actMinLaserValue <= self.distanceToWall):
                 self.rotate_angle(self.angle, self.turnSpeed)
             else:
                 # search for a wall
@@ -158,7 +158,7 @@ class MazeSolver:
         if(self.leftHand):
             pidValue = pidValue * (-1)
 
-        if(actMinLaserValue <= self.distanceToWall + 0.05): # obstacle in front of the robot
+        if(actMinLaserValue <= self.distanceToWall): # obstacle in front of the robot
             self.rotate_angle(self.angle, self.turnSpeed)
         elif(pidValue == 0):
             self.vel.linear.x = 0.3
@@ -188,6 +188,8 @@ class MazeSolver:
             # Forcing the robot to stop
             self.vel.angular.z = 0
             self.velPub.publish(self.vel)
+            # fixes issue #6
+            self.pid.resetValues()
         finally:
             self.mutex.release()
 
