@@ -37,7 +37,7 @@ class MazeSolver:
         self.timeoutForDetection = 12       # seconds
 
         # set up wall follower
-        self.leftHand = True            # Tru, if the robot uses the left sensor for wall follow
+        self.leftHand = True            # True, if the robot uses the left sensor for wall follow
         self.laserIndex = 359
         self.turnSpeed = -0.3
         self.distanceToWall = 0.4
