@@ -20,6 +20,23 @@ sudo apt-get install git gitg htop terminator atom
 sudo apt-get install ros-kinetic-turtlebot-simulator ros-kinetic-turtlebot-teleop
 ```
 
+### Update your gazebo with the following commands
+
+Add OSRF package repo
+
+    sudo sh -c 'echo "deb http://packages.osrfoundation.org/gazebo/ubuntu-stable `lsb_release -cs` main" > /etc/apt/sources.list.d/gazebo-stable.list'
+
+setup keys
+
+    wget http://packages.osrfoundation.org/gazebo.key -O - | sudo apt-key add -
+
+update gazebo
+
+    sudo apt-get update
+    sudo apt-get install gazebo7
+
+
+
 ### Mounting Hokuyo Laser Scanner onto the Turtlebot
 
 We have modified the `turtlebot_description` package that has the simulated model of the turtlebot and put in some upgrades that should make your life easier. After following these
