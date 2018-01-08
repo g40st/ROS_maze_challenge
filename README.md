@@ -35,8 +35,6 @@ update gazebo
     sudo apt-get update
     sudo apt-get install gazebo7
 
-
-
 ### Mounting Hokuyo Laser Scanner onto the Turtlebot
 
 We have modified the `turtlebot_description` package that has the simulated model of the turtlebot and put in some upgrades that should make your life easier. After following these
@@ -87,6 +85,15 @@ Your gazebo simulation should now look like below:
 
 ![maze](/uploads/0c6118ab0a00198acdcb42b54ebe1c1f/maze.png)
 
+
+## How to use this ROS-Node (step-by-step)
+
+1. follow the install instructions
+2. download the repository in your catkin workspace
+3. run the simulation by using: `roslaunch turtlebot_gazebo turtlebot_world.launch`
+4. load the maze in your simulation: `rosrun gazebo_ros spawn_model -file ~/catkin_ws/src/ch-171744_tier4/maze_practice/model.sdf -sdf -model -maze -x 16 -y 5`
+    note: adopt the path to your system
+5. run the ROS-node to solve the maze by using: `roslaunch maze maze.launch`
 
 
 ## Description of the Solution
