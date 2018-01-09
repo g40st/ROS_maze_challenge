@@ -1,7 +1,7 @@
 # maze solver (ROS)
-This repository contains an algorithm to solve a maze. Bascially it uses wall detection and wall follow. 
+This repository contains an algorithm to solve a maze. Basically it uses wall detection and wall follow. 
 
-![maze](/uploads/0c6118ab0a00198acdcb42b54ebe1c1f/maze.png)
+<img src="/uploads/0c6118ab0a00198acdcb42b54ebe1c1f/maze.png" width="35%">
 
 ## Installing / Getting started (Linux)
 
@@ -83,8 +83,7 @@ Be sure to enter your repository name correctly in the above command. An example
 
 Your gazebo simulation should now look like below:
 
-![maze](/uploads/0c6118ab0a00198acdcb42b54ebe1c1f/maze.png)
-
+<img src="/uploads/0c6118ab0a00198acdcb42b54ebe1c1f/maze.png" width="35%">
 
 ## How to use this ROS-Node (step-by-step)
 
