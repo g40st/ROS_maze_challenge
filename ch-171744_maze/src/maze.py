@@ -55,7 +55,7 @@ class MazeSolver:
         iMax = 0.4
         self.pid = PID(kp, ki, kd, outMin, outMax, iMin, iMax)
 
-        # actual drive state (inital: WallDetection)
+        # actual drive state (initial: WallDetection)
         self.driveState = "WallDetection"
 
     def odom_callback(self, odom_msg):
@@ -89,9 +89,9 @@ class MazeSolver:
                     self.wallDetection(actMinLaserValue)
                 elif(self.driveState == "driveToWall"):
                     if(self.mutex.locked() == False):
-                        if(actMinLaserValue <= self.distanceToWall): # obstacle in front of the robot
+                        if(actMinLaserValue <= self.distanceToWall): # obstacle in front of the robot or wall arrived
 
-                            # save the actual position for loop detection
+                            # save the actual position used for loop detection
                             self.knownPoints.append([self.odom.pose.pose.position.x,self.odom.pose.pose.position.y, rospy.Time.now().to_sec()])
 
                             self.vel.linear.x = 0.0
