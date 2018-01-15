@@ -1,7 +1,7 @@
 # maze solver (ROS)
 This repository contains an algorithm to solve a maze. Basically it uses wall detection and wall follow. 
 
-<img src="/uploads/0c6118ab0a00198acdcb42b54ebe1c1f/maze.png" width="35%">
+<img src="/uploads/0c6118ab0a00198acdcb42b54ebe1c1f/maze.png" width="50%">
 
 ## Installing / Getting started (Linux)
 
