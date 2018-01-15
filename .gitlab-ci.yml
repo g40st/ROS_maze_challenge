@@ -1,0 +1,12 @@
+image: 141.69.58.19:5000/iki/ros-kinetic-amr:latest
+
+before_script:
+  - source /root/catkin_ws/devel/setup.bash
+
+stages:
+    - catkin make
+
+catkin make:
+    stage: catkin make
+    script:
+    - roscd; cd ..; catkin_make
