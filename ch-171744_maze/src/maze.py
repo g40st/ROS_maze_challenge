@@ -149,9 +149,12 @@ class MazeSolver:
                 if(getLaserIndex <= 170 or getLaserIndex >= 180):
                     tmpAngle = self.laser.angle_min + (getLaserIndex * self.laser.angle_increment)
                     if(getLaserIndex < 170): # rotation to the right
-                        self.rotate_angle(abs(tmpAngle), -0.25)
+                        self.rotate_angle(abs(tmpAngle), -0.3)
                     else:   # rotation to the left
-                        self.rotate_angle(abs(tmpAngle), 0.25)
+                        self.rotate_angle(abs(tmpAngle), 0.3)
+
+                # wait until the robot has stopped the rotation
+                rospy.sleep(1.5)
                 self.driveState = "driveToWall"
         finally:
             self.mutex2.release()
@@ -180,7 +183,7 @@ class MazeSolver:
             self.vel.linear.x = 0.0
             self.vel.angular.z = angular_speed
 
-            # Setting the current time for distance calculus
+            # setting the current time for distance calculus
             t0 = rospy.Time.now().to_sec()
             current_angle = 0
 
@@ -189,7 +192,8 @@ class MazeSolver:
                 t1 = rospy.Time.now().to_sec()
                 current_angle = abs(angular_speed)*(t1-t0)
 
-            # Forcing the robot to stop
+            # forcing the robot to stop after rotation
+            self.vel.linear.x = 0.0
             self.vel.angular.z = 0
             self.velPub.publish(self.vel)
             # fixes issue #6 (Weird Driving at Wall Following)
