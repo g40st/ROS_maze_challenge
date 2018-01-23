@@ -2,4 +2,7 @@
 <!-- My Package launch file -->
 <node pkg="ch-171744_maze" type="maze.py" name="MazeSolverNode" output="screen">
 </node>
+<include file="$(find goal_pub)/launch/goal_pub.launch"/>
+<include file="$(find dist_tracker)/launch/dist_tracker.launch"/>
+
 </launch>
