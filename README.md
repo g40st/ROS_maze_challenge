@@ -3,7 +3,7 @@ This repository enables a robot to leave a maze. Basically it uses wall detectio
 
 <img src="/uploads/0c6118ab0a00198acdcb42b54ebe1c1f/maze.png" width="50%">
 
-## Installing / Getting started (Linux)https://fbe-gitlab.hs-weingarten.de/stud-amr-ws2017-master/ch-171744_tier4
+## Installing / Getting started (Linux)
 
 ### Install Ros and other Tools
 
@@ -87,17 +87,17 @@ Your gazebo simulation should now look like below:
 
 ## How to use this ROS-Node (step-by-step)
 
-1. follow the install instructions
-2. download the repository in your catkin workspace
-3. run the simulation by using: `roslaunch turtlebot_gazebo turtlebot_world.launch`
-4. load the maze in your simulation: `rosrun gazebo_ros spawn_model -file ~/catkin_ws/src/ch-171744_tier4/maze_practice/model.sdf -sdf -model -maze -x 16 -y 5`
+1. Follow the install instructions
+2. Download the repository in your catkin workspace
+3. Run the simulation by using: `roslaunch turtlebot_gazebo turtlebot_world.launch`
+4. Load the maze in your simulation: `rosrun gazebo_ros spawn_model -file ~/catkin_ws/src/ch-171744_tier4/maze_practice/model.sdf -sdf -model -maze -x 16 -y 5`
     note: adopt the path to your system
-5. run the ROS-node to solve the maze by using: `roslaunch ch-171744_maze start_maze.launch`
+5. Run the ROS-node to solve the maze by using: `roslaunch ch-171744_maze start_maze.launch`
 
 
 ## Description of the Solution
 
-### Algorithm (shorted pseudocode)
+### Algorithm (pseudo code)
 
 ```
 save the actual x- and y-position (loop-detection)
