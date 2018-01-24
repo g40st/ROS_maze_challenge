@@ -33,7 +33,7 @@ class MazeSolver:
 
         # set up loop detection
         self.knownPoints = []
-        self.epsilonAroundPoints = 0.25     # circle around the saved point
+        self.epsilonAroundPoints = 0.1     # circle around the saved point
         self.timeoutForDetection = 12       # seconds
 
         # set up wall follower
