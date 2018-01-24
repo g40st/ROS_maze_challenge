@@ -1,14 +1,14 @@
-# maze solver (ROS)
-This repository contains an algorithm to solve a maze. Basically it uses wall detection and wall follow. 
+# Maze Solver (ROS)
+This repository enables a robot to leave a maze. Basically it uses wall detection and wall follow algorithms. 
 
 <img src="/uploads/0c6118ab0a00198acdcb42b54ebe1c1f/maze.png" width="50%">
 
-## Installing / Getting started (Linux)
+## Installing / Getting started (Linux)https://fbe-gitlab.hs-weingarten.de/stud-amr-ws2017-master/ch-171744_tier4
 
 ### Install Ros and other Tools
 
 **Warning! Please use Ubuntu 16.04 as this is the Long Term Support Version (LTS). If you are using Ubuntu 17.04 you have to use ROS Lunar release on your own risk!**
-
+https://fbe-gitlab.hs-weingarten.de/stud-amr-ws2017-master/ch-171744_tier4/edit/master/README.md#editor
 First goto http://wiki.ros.org/kinetic/Installation/Ubuntu and follow the instructions there. The installation can take some time depending on your internet connection.
 
 After the ros setup is completed you should install these extra tools
@@ -126,36 +126,37 @@ while not rospy.is_shutdown():
 
 ### Wall Detection
 
-* In this case the algorithm detects two walls. Beyond this two walls the wall with the biggest distance will be choosen. 
+* In the image below you can see an example how the wall detection algorithm works. In this case the algorithm detects two walls. 
+  Among these two walls, the wall with the biggest distance will be chosen. 
 
     ![wall1](/uploads/cc804a6a30a68fbe4ef532f0910bd25d/wall1.png)
     
     How does the wall detection work:
     
-    There must be a predefined amount of points between the upper- and lower bound. Another constraint is that the points must be next to each other. 
+    There must be a predefined amount of points between the upper- and lower bound (see image below) . Another constraint is that the points must be next to each other. 
     Otherwise it will not be detected as a wall.  
     
     ![wallDet6](/uploads/69e3766f6929081cb594986d43d67130/wallDet6.png)
 
-* Do a turn and drive to the detected wall.
+* Turn and move to the detected wall.
 
     ![wallD2](/uploads/f7a27bbbd6447538e1d0f6a603f1ff5a/wallD2.png)
 
-* Save the actual x- and y-position (green circle) and do a turn. After that use the wall follow function.
+* After the robot arrived in front of the detected wall, save the actual x- and y-position (depicted as green circle in the image below) and do a turn. After that use the wall follow algorithm.
 
     ![wallD3](/uploads/be8dab7568350e134cf5cd9d9282cfa0/wallD3.png)
 
 ### Wall Follow
 
-A PID-controller is used to adopt the direction of movement .
+A PID-controller is used to adjust the direction of movement .
 
 ![wallF](/uploads/569fb71f0dcb1b3193d32ea072b9df15/wallF.gif)
 
 
 ### Loop Detection
 
-The robot saves the start position. After that the robot will follow this wall until it hits the start position. This whole drive along the wall is skipped in the video.
-The robot hits the start position and does a wall detection. This is the reason why the robot can escape from this loop. Otherwise the robot would drive along this wall in a loop.
+When the wall follow algorithm starts, the robot saves it actual position into a list of positions. This position will be used for loop detection.
+If the robot hits any of these stored positions a loop is detected. In this case wall detection is used to reposition the robot.
 
 ![loopDetec](/uploads/d869d099a6487baf842f13d862310e76/loopDetec.gif)
 
