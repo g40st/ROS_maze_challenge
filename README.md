@@ -158,7 +158,7 @@ A PID-controller is used to adjust the direction of movement .
 When the wall follow algorithm starts, the robot saves it actual position into a list of positions. This position will be used for loop detection.
 If the robot hits any of these stored positions a loop is detected. In this case wall detection is used to reposition the robot.
 
-![loopDetec](/uploads/d869d099a6487baf842f13d862310e76/loopDetec.gif)
+![loopDetection](/uploads/e3a96cb00c3716663dc4f53876123a6a/ezgif.com-optimize.gif)
 
 
 ## Author
