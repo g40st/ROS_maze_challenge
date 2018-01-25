@@ -92,7 +92,7 @@ Your gazebo simulation should now look like below:
 3. Run the simulation by using: `roslaunch turtlebot_gazebo turtlebot_world.launch`
 4. Load the maze in your simulation: `rosrun gazebo_ros spawn_model -file ~/catkin_ws/src/ch-171744_tier4/maze_practice/model.sdf -sdf -model -maze -x 16 -y 5`
     note: adopt the path to your system
-5. Run the ROS-node to solve the maze by using: `roslaunch ch-171744_maze start_maze.launch`
+5. Run the ROS-node to solve the maze by using: `roslaunch ch_171744_maze start_maze.launch`
 
 
 ## Description of the Solution
