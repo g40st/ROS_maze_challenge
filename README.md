@@ -8,7 +8,7 @@ This repository enables a robot to leave a maze. Basically it uses wall detectio
 ### Install Ros and other Tools
 
 **Warning! Please use Ubuntu 16.04 as this is the Long Term Support Version (LTS). If you are using Ubuntu 17.04 you have to use ROS Lunar release on your own risk!**
-https://fbe-gitlab.hs-weingarten.de/stud-amr-ws2017-master/ch-171744_tier4/edit/master/README.md#editor
+
 First goto http://wiki.ros.org/kinetic/Installation/Ubuntu and follow the instructions there. The installation can take some time depending on your internet connection.
 
 After the ros setup is completed you should install these extra tools
