@@ -1,7 +1,7 @@
 # Maze Solver (ROS)
 This repository enables a robot to leave a maze. Basically it uses wall detection and wall follow algorithms. 
 
-<img src="/uploads/0c6118ab0a00198acdcb42b54ebe1c1f/maze.png" width="50%">
+<img src="https://user-images.githubusercontent.com/7523395/35778687-047ef1e4-09c2-11e8-8766-cceff7a3e3f9.png" width="50%">
 
 ## Installing / Getting started (Linux)
 
@@ -18,6 +18,24 @@ sudo apt-add-repository ppa:webupd8team/atom
 sudo apt-get update
 sudo apt-get install git gitg htop terminator atom
 sudo apt-get install ros-kinetic-turtlebot-simulator ros-kinetic-turtlebot-teleop
+```
+
+### Create catkin workspace
+
+All your ROS packages must be stored in a special folder called __catkin workspace__.
+ROS uses the [catkin](http://docs.ros.org/api/catkin/html/) build system to manage your codebase.
+We will not go deeper into exactly what this build system is, but for now, you need to create a catkin workspace before you create your first package.
+
+__This is very important! All your ROS code must always be located somewhere under `<path to your catkin_ws>/src`!__
+
+```
+mkdir -p ~/catkin_ws/src
+cd ~/catkin_ws/src
+catkin_init_workspace       #initiates the catkin workspace
+cd ~/catkin_ws
+catkin_make                 #compiles the catkin workspace
+echo "source ~/catkin_ws/devel/setup.bash" >> ~/.bashrc
+source ~/.bashrc
 ```
 
 ### Update your gazebo with the following commands
@@ -69,7 +87,7 @@ the `export TURTLEBOT_3D_SENSOR` line in the `.bashrc` file.
   
     To launch the simulation use: `roslaunch turtlebot_gazebo turtlebot_world.launch`
 
-![](https://fbe-gitlab.hs-weingarten.de/mat-iki/amr-mat/raw/master/.img/turtlebot_hokuyo.png)
+![](https://user-images.githubusercontent.com/7523395/35778702-3cfa014e-09c2-11e8-9f1d-bc1b28de14bc.png)
 
 ### Loading the Maze into the Simulation
 
@@ -83,7 +101,7 @@ Be sure to enter your repository name correctly in the above command. An example
 
 Your gazebo simulation should now look like below:
 
-<img src="/uploads/0c6118ab0a00198acdcb42b54ebe1c1f/maze.png" width="35%">
+<img src="https://user-images.githubusercontent.com/7523395/35778687-047ef1e4-09c2-11e8-8766-cceff7a3e3f9.png" width="35%">
 
 ## How to use this ROS-Node (step-by-step)
 
@@ -129,28 +147,28 @@ while not rospy.is_shutdown():
 * In the image below you can see an example how the wall detection algorithm works. In this case the algorithm detects two walls. 
   Among these two walls, the wall with the biggest distance will be chosen. 
 
-    ![wall1](/uploads/cc804a6a30a68fbe4ef532f0910bd25d/wall1.png)
+    ![wall1](https://user-images.githubusercontent.com/7523395/35778713-5676082a-09c2-11e8-834b-0c0dcef3948a.png)
     
     How does the wall detection work:
     
     There must be a predefined amount of points between the upper- and lower bound (see image below) . Another constraint is that the points must be next to each other. 
     Otherwise it will not be detected as a wall.  
     
-    ![wallDet6](/uploads/69e3766f6929081cb594986d43d67130/wallDet6.png)
+    ![wall2](https://user-images.githubusercontent.com/7523395/35778718-66f8d4fc-09c2-11e8-9feb-6f9d673e93cf.png)
 
 * Turn and move to the detected wall.
 
-    ![wallD2](/uploads/f7a27bbbd6447538e1d0f6a603f1ff5a/wallD2.png)
+    ![wall3](https://user-images.githubusercontent.com/7523395/35778724-7468a978-09c2-11e8-9985-ed7814b221cc.png)
 
 * After the robot arrived in front of the detected wall, save the actual x- and y-position (depicted as green circle in the image below) and do a turn. After that use the wall follow algorithm.
 
-    ![wallD3](/uploads/be8dab7568350e134cf5cd9d9282cfa0/wallD3.png)
+    ![wall4](https://user-images.githubusercontent.com/7523395/35778735-a46a11de-09c2-11e8-9727-44476faa12e4.png)
 
 ### Wall Follow
 
 A PID-controller is used to adjust the direction of movement .
 
-![wallF](/uploads/569fb71f0dcb1b3193d32ea072b9df15/wallF.gif)
+![wallf](https://user-images.githubusercontent.com/7523395/35778747-cd64ba1c-09c2-11e8-98cb-1f8ff4fdfebf.gif)
 
 
 ### Loop Detection
@@ -158,7 +176,7 @@ A PID-controller is used to adjust the direction of movement .
 When the wall follow algorithm starts, the robot saves it actual position into a list of positions. This position will be used for loop detection.
 If the robot hits any of these stored positions a loop is detected. In this case wall detection is used to reposition the robot.
 
-![loopDetection](/uploads/e3a96cb00c3716663dc4f53876123a6a/ezgif.com-optimize.gif)
+![loopdetection](https://user-images.githubusercontent.com/7523395/35778761-ff2a2d0c-09c2-11e8-9a20-1cbcd6ce016a.gif)
 
 
 ## Author
