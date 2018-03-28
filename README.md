@@ -3,6 +3,9 @@ This repository enables a robot to leave a maze. Basically it uses wall detectio
 
 <img src="https://user-images.githubusercontent.com/7523395/35778687-047ef1e4-09c2-11e8-8766-cceff7a3e3f9.png" width="50%">
 
+
+Video: https://www.youtube.com/watch?v=Sf2yfDI60GU
+
 ## Installing / Getting started (Linux)
 
 ### Install Ros and other Tools
